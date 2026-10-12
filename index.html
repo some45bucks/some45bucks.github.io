@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jacob Haight</title>
+  <meta name="description" content="Jacob Haight — AI researcher and engineer working on multi-agent reinforcement learning, robot learning, and perception. Co-founder & CTO of Strawberry Robotics. IROS 2025 first author.">
+  <meta property="og:title" content="Jacob Haight">
+  <meta property="og:description" content="AI researcher and engineer: multi-agent RL, robot learning, perception.">
+  <meta property="og:image" content="assets/media/share.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero wrap">
+    <h1 class="name">Jacob Haight</h1>
+    <p class="lede">I build learning systems for robots: heterogeneous multi-agent reinforcement learning at GPU scale, imitation learning, and 3D perception.</p>
+    <p class="status">Co-founder &amp; CTO at Strawberry Robotics. M.S. Computer Science, Utah State University. Open to research and engineering roles in AI, including AI safety.</p>
+    <nav class="links" aria-label="Contact and profiles">
+      <a href="mailto:jacobrhaight@gmail.com">Email</a>
+      <a href="https://github.com/some45bucks">GitHub</a>
+      <a href="https://www.linkedin.com/in/jacob-haight-138480183">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap section" aria-labelledby="research">
+      <h2 id="research">Research</h2>
+
+      <article class="paper featured">
+        <h3>Heterogeneous Multi-Agent Learning in Isaac Lab: Scalable Simulation for Robotic Collaboration</h3>
+        <p class="venue">IROS 2025, first author</p>
+        <p class="authors"><strong>Jacob Haight</strong>, Isaac Peterson, Christopher Allred, Mario Harper</p>
+        <p>Most multi-agent RL tooling assumes every agent is the same robot. I added heterogeneous-agent RL algorithms (HAPPO, HATRPO, HAA2C, alongside MAPPO baselines) to NVIDIA Isaac Lab, so teams of different robots, such as legged and wheeled platforms, can be trained together in GPU-parallel physics simulation.</p>
+
+        <div class="yt" data-id="GCoUsj5UNqY">
+          <button type="button" class="yt-play" aria-label="Play the IROS 2025 paper video">
+            <img src="https://i.ytimg.com/vi/GCoUsj5UNqY/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+            <span class="yt-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <p class="actions">
+          <a href="https://doi.org/10.1109/IROS60139.2025.11247098">Paper</a>
+          <a href="https://github.com/DIRECTLab/IsaacLab-HARL">Code</a>
+          <a href="https://directlab.dev/IsaacLab-HARL/papers/paper-harl.html">Project page</a>
+          <a href="https://youtu.be/GCoUsj5UNqY">Video on YouTube</a>
+        </p>
+        <p class="note">The framework became a platform for the lab's follow-up work on adversarial heterogeneous teams (<a href="https://arxiv.org/abs/2510.01264">Peterson et al., 2025</a>).</p>
+      </article>
+
+      <article class="paper">
+        <h3>Advancing Multi-Agent Robotics Simulations Through Heterogeneous Reinforcement Learning in IsaacLab</h3>
+        <p class="venue">M.S. thesis, Utah State University, 2025. Advisor: Mario Harper</p>
+        <p>Builds on the IROS work: a GPU-accelerated platform for training both uniform and mixed robot teams, aimed at closing the gap between simulated and real multi-robot deployment.</p>
+        <p class="actions"><a href="https://digitalcommons.usu.edu/etd2023/451">Read the thesis</a></p>
+      </article>
+
+      <article class="paper">
+        <h3>Coordinating Search with Foundation Models and Multi-Agent Reinforcement Learning in Complex Environments</h3>
+        <p class="venue">IRC 2024, co-author</p>
+        <p class="authors">C. Allred et al., including <strong>Jacob Haight</strong></p>
+        <p class="actions"><a href="https://doi.org/10.1109/IRC63610.2024.00046">Paper</a></p>
+      </article>
+    </section>
+
+    <section class="section strawberry" aria-labelledby="strawberry">
+      <div class="wrap">
+        <h2 id="strawberry">Strawberry Robotics</h2>
+        <p class="venue">Co-founder &amp; CTO, 2025–present</p>
+        <p>Strawberry Robotics is building SHARP, a gantry-mounted, two-armed harvesting robot for strawberries and other canopy crops. We were a two-person founding team; I owned the AI side end to end: simulation, perception, and robot learning.</p>
+      </div>
+
+      <figure class="reel wrap-wide">
+        <video id="reel" src="assets/media/strawberry-reel.mp4" poster="assets/media/reel-poster.jpg" controls muted playsinline preload="metadata"></video>
+        <ol class="chapters" id="chapters" aria-label="Video chapters">
+          <li><button type="button" data-start="0" data-end="3"><span class="t">0:00</span> Teleoperated picking in Isaac Sim</button></li>
+          <li><button type="button" data-start="3" data-end="5"><span class="t">0:03</span> SHARP kinematics simulator</button></li>
+          <li><button type="button" data-start="5" data-end="7"><span class="t">0:05</span> Berry and stem perception</button></li>
+          <li><button type="button" data-start="7" data-end="11"><span class="t">0:07</span> Simulated strawberry bed</button></li>
+          <li><button type="button" data-start="11" data-end="18"><span class="t">0:11</span> Robot camera views</button></li>
+          <li><button type="button" data-start="18" data-end="30"><span class="t">0:18</span> One- and two-arm teleoperated picks</button></li>
+        </ol>
+        <figcaption>Public highlight reel. Click a chapter to jump to it. Everything shown is simulation work or my perception model running on test scans.</figcaption>
+      </figure>
+
+      <div class="wrap">
+        <h3 class="sub">What I built</h3>
+        <dl class="built">
+          <dt>Simulation environment</dt>
+          <dd>The Isaac Sim strawberry environment with the custom SHARP arms, used to record teleoperated picks and to train and test policies.</dd>
+          <dt>Perception</dt>
+          <dd>A point-transformer model that segments depth scans of strawberry plants into leaves and berries and predicts each berry's stem attachment point and direction, plus a YOLO detector, integrated into one pose-estimation pipeline.</dd>
+          <dt>Robot learning</dt>
+          <dd>Teleoperated demonstrations for imitation learning on a multistep picking task, fine-tuning of a large vision-language-action model on our own dataset, and an automated reward-shaping tool for training a novel dexterous gripper across multiple machines.</dd>
+        </dl>
+        <p class="actions"><a href="https://strawberryrobotics.com/">strawberryrobotics.com</a></p>
+      </div>
+    </section>
+
+    <section class="wrap section" aria-labelledby="more">
+      <h2 id="more">Other work</h2>
+      <ul class="more">
+        <li>
+          <h3>Software Developer, Western Ag Credit</h3>
+          <p class="venue">2022–2025</p>
+          <p>Built internal applications in JavaScript, C#, and SQL, including a tool for visualizing a complex database.</p>
+        </li>
+        <li>
+          <h3><a href="https://github.com/some45bucks/OopsAllGradsFinal">Rover mapping and person detection</a></h3>
+          <p>A ROS 2 wheeled rover that maps its surroundings and points toward nearby people, using a YOLO model fine-tuned on infrared images and running on a Jetson Nano.</p>
+        </li>
+        <li>
+          <h3><a href="https://github.com/some45bucks/MLG_Project">Scene graphs for RL in VizDoom</a></h3>
+          <p>Tested whether adding graph-structured scene information helps recurrent APPO agents in VizDoom navigation and combat scenarios.</p>
+        </li>
+        <li>
+          <h3><a href="https://github.com/some45bucks/HeartsRL">Reinforcement learning for Hearts</a></h3>
+          <p>Trained agents to play the card game Hearts, with a custom <a href="https://github.com/some45bucks/HeartsGym">Gym environment</a>.</p>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Get in touch at <a href="mailto:jacobrhaight@gmail.com">jacobrhaight@gmail.com</a>.</p>
+  </footer>
+
+  <script src="main.js" defer></script>
+</body>
+</html>
