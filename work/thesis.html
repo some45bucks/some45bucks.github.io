@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Master's Thesis | Jacob Haight</title>
+  <meta name="description" content="Jacob Haight's M.S. thesis: heterogeneous multi-agent reinforcement learning in Isaac Lab, with a Spot quadruped split into cooperating agents.">
+  <meta property="og:image" content="../assets/img/thesis-results-150m.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="bar">
+      <a class="home" href="../index.html">Jacob Haight</a>
+      <nav aria-label="Contact and profiles">
+        <a href="mailto:jacobrhaight@gmail.com">Email</a>
+        <a href="https://github.com/some45bucks">GitHub</a>
+        <a href="https://www.linkedin.com/in/jacob-haight-138480183">LinkedIn</a>
+      </nav>
+    </header>
+
+    <div class="project-head">
+      <a class="crumb" href="../index.html">All work</a>
+      <h1>Advancing Multi-Agent Robotics Simulations Through Heterogeneous Reinforcement Learning in IsaacLab</h1>
+      <p class="meta">M.S. thesis, Utah State University, 2025</p>
+    </div>
+
+    <figure class="feature-media">
+      <div class="pair">
+        <figure>
+          <div class="yt" data-id="IcW1s5Gj_Uw" data-title="Spot trained with MAPPO">
+            <button type="button" class="yt-play" aria-label="Play: Spot gait trained with MAPPO">
+              <img src="https://i.ytimg.com/vi/IcW1s5Gj_Uw/hqdefault.jpg" alt="" width="480" height="360">
+              <span class="yt-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <figcaption>MAPPO: dragging feet, frequent stumbles</figcaption>
+        </figure>
+        <figure>
+          <div class="yt" data-id="dC1D3dBDt3Q" data-title="Spot trained with HAPPO">
+            <button type="button" class="yt-play" aria-label="Play: Spot gait trained with HAPPO">
+              <img src="https://i.ytimg.com/vi/dC1D3dBDt3Q/hqdefault.jpg" alt="" width="480" height="360">
+              <span class="yt-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <figcaption>HAPPO: higher leg lift, legs in sync</figcaption>
+        </figure>
+      </div>
+      <figcaption>The same quadruped with each leg controlled by a separate agent, trained with two different multi-agent algorithms.</figcaption>
+    </figure>
+
+    <div class="layout">
+      <article class="prose">
+        <h2>The question</h2>
+        <p>The thesis builds on my <a href="isaac-lab-harl.html">IROS 2025 work</a>, which brought heterogeneous-agent RL into NVIDIA Isaac Lab. Here I asked whether that extension pays off in practice: do the theoretical advantages of heterogeneous algorithms show up as better policies inside Isaac Lab, and what do they cost in training speed?</p>
+        <p>Isaac Lab's built-in multi-agent algorithms, MAPPO and IPPO, update every agent at the same time. Each agent improves against an outdated picture of what its teammates will do, so individually good updates can combine into a worse team. HAPPO updates agents one after another, with each update accounting for the ones before it, which gives a guarantee that the team's joint policy keeps improving.</p>
+
+        <h2>One robot, many agents</h2>
+        <p>To test this, I made a single robot the team: several agents jointly control one body, so they have to coordinate every step to walk at all. A Spot quadruped's twelve joints were split between cooperating agents in two ways. Each agent can also see its teammates' observations, but with much more noise added.</p>
+        <div class="pair">
+          <figure>
+            <img src="../assets/img/thesis-legs-4x3.png" alt="Quadruped diagram with four agents, one controlling each leg" class="diagram" loading="lazy">
+            <figcaption><strong>Spot-Factorized-4x3.</strong> Four agents, one per leg, each with the same action and observation space. The more homogeneous task.</figcaption>
+          </figure>
+          <figure>
+            <img src="../assets/img/thesis-legs-4p8.png" alt="Quadruped diagram with two agents splitting the joints into two groups" class="diagram" loading="lazy">
+            <figcaption><strong>Spot-Factorized-4+8.</strong> Two agents splitting the joints 4 and 8 along hip and knee lines, with different action and observation spaces. The more heterogeneous task.</figcaption>
+          </figure>
+        </div>
+
+        <h2>Results</h2>
+        <p>I compared HAPPO with MAPPO in two forms: with shared parameters (MAPPO), and with a separate network per agent (MAPPO*).</p>
+        <figure class="fig white">
+          <img src="../assets/img/thesis-results-10m.png" alt="Average reward per step over 10 million steps for MAPPO, MAPPO*, and HAPPO on both tasks" loading="lazy">
+          <figcaption>First 10 million steps. MAPPO with shared parameters falls behind on the four-leg task, while HAPPO and MAPPO* stay close on both.</figcaption>
+        </figure>
+        <p>The first result did not match the theory: HAPPO didn't beat MAPPO*. I considered four explanations. HAPPO's extra machinery might only help in niche cases, the tasks might be too simple to tell the algorithms apart, its advantage might only appear with longer training, or MAPPO* might be overfitting the reward. A 150-million-step run on the four-leg task answered all four.</p>
+        <figure class="fig white">
+          <img src="../assets/img/thesis-results-150m.png" alt="Four learning curves over 150 million steps: total reward, gait reward, linear velocity error, and angular velocity error for MAPPO* and HAPPO" loading="lazy">
+          <figcaption>150 million steps on Spot-Factorized-4x3. HAPPO pulls ahead on total and gait reward and keeps a lower angular velocity tracking error.</figcaption>
+        </figure>
+        <p>With enough training, HAPPO's sequential updates find a better joint policy, and the difference is visible in the gait: the HAPPO-trained robot lifts its legs higher and moves them in sync, while the MAPPO-trained robot drags its feet and stumbles.</p>
+
+        <h2>Cost in training speed</h2>
+        <p>Sequential updates add almost no overhead. Throughput stayed within 1% of MAPPO*, and the number of agents affected speed more than the choice of algorithm.</p>
+        <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Algorithm</th><th>Task</th><th class="num">Steps per second</th><th class="num">Time (s)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>HAPPO</td><td>Spot-Factorized-4+8</td><td class="num">24,148</td><td class="num">410</td></tr>
+            <tr><td>MAPPO*</td><td>Spot-Factorized-4+8</td><td class="num">24,131</td><td class="num">410</td></tr>
+            <tr><td>HAPPO</td><td>Spot-Factorized-4x3</td><td class="num">21,607</td><td class="num">458</td></tr>
+            <tr><td>MAPPO*</td><td>Spot-Factorized-4x3</td><td class="num">21,817</td><td class="num">453</td></tr>
+            <tr><td>MAPPO</td><td>Spot-Factorized-4x3</td><td class="num">24,226</td><td class="num">408</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h2>Limitations and next steps</h2>
+        <ul>
+          <li>Isaac Lab released updates during the project, so full integration with the latest version needs some rework.</li>
+          <li>The new environments need more reward tuning before their policies could carry over to real robots.</li>
+          <li>Natural next steps are graph neural network policies in Isaac Lab and more advanced algorithms built on sequential updates.</li>
+        </ul>
+      </article>
+
+      <aside class="facts" aria-label="Thesis details">
+        <dl>
+          <dt>Degree</dt>
+          <dd>M.S. Computer Science, Utah State University, May 2025</dd>
+          <dt>Committee</dt>
+          <dd>Mario Harper (chair), John Edwards, Shah Hamdi</dd>
+          <dt>Links</dt>
+          <dd>
+            <ul>
+              <li><a href="https://digitalcommons.usu.edu/etd2023/451">Read the thesis</a></li>
+              <li><a href="https://github.com/DIRECTLab/IsaacLab-HARL">Code on GitHub</a></li>
+              <li><a href="isaac-lab-harl.html">IROS 2025 paper</a></li>
+            </ul>
+          </dd>
+          <dt>Tools</dt>
+          <dd>Isaac Lab, Isaac Sim, PyTorch, HARL</dd>
+        </dl>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <p><a href="../index.html">All work</a></p>
+    </footer>
+  </div>
+  <script src="../main.js" defer></script>
+</body>
+</html>

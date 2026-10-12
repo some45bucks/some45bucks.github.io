@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Strawberry Robotics | Jacob Haight</title>
+  <meta name="description" content="Jacob Haight, co-founder and CTO of Strawberry Robotics: simulation, perception, and robot learning for a two-armed strawberry harvester.">
+  <meta property="og:image" content="../assets/img/sr-dual-arm.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="bar">
+      <a class="home" href="../index.html">Jacob Haight</a>
+      <nav aria-label="Contact and profiles">
+        <a href="mailto:jacobrhaight@gmail.com">Email</a>
+        <a href="https://github.com/some45bucks">GitHub</a>
+        <a href="https://www.linkedin.com/in/jacob-haight-138480183">LinkedIn</a>
+      </nav>
+    </header>
+
+    <div class="project-head">
+      <a class="crumb" href="../index.html">All work</a>
+      <h1>Strawberry Robotics</h1>
+      <p class="meta">Co-founder &amp; CTO, 2025–present</p>
+    </div>
+
+    <figure class="feature-media">
+      <video id="reel" src="../assets/media/strawberry-reel.mp4" poster="../assets/img/sr-poster.jpg" controls muted playsinline preload="metadata" data-autoplay></video>
+      <ol class="chapters" id="chapters" aria-label="Video chapters">
+        <li><button type="button" data-start="0" data-end="3"><span class="t">0:00</span> Teleoperated picking in Isaac Sim</button></li>
+        <li><button type="button" data-start="3" data-end="5"><span class="t">0:03</span> SHARP kinematics simulator</button></li>
+        <li><button type="button" data-start="5" data-end="7"><span class="t">0:05</span> Berry and stem perception</button></li>
+        <li><button type="button" data-start="7" data-end="11"><span class="t">0:07</span> Simulated strawberry bed</button></li>
+        <li><button type="button" data-start="11" data-end="18"><span class="t">0:11</span> Robot camera views</button></li>
+        <li><button type="button" data-start="18" data-end="30"><span class="t">0:18</span> One- and two-arm teleoperated picks</button></li>
+      </ol>
+      <figcaption>Public highlight reel. Select a chapter to jump to it. Everything shown is my simulation work or my perception model running on test scans.</figcaption>
+    </figure>
+
+    <div class="layout">
+      <article class="prose">
+        <h2>The company</h2>
+        <p>California strawberry growers lose crops because there aren't enough workers to harvest them, and conventional robot arms are too slow to pick profitably. Strawberry Robotics is building SHARP, a gantry-mounted, two-armed harvesting robot for strawberries and other canopy crops, with low-inertia hydrostatic arms designed for fast picks.</p>
+        <p>We were a two-person founding team. My co-founder Walt White led strategy and product; I owned the AI side end to end: simulation, perception, and robot learning.</p>
+
+        <h2>Simulation</h2>
+        <p>All of our robot learning ran through simulation. I built the strawberry environment in NVIDIA Isaac Sim with SHARP's custom arms, plant beds, and robot cameras, and used it to record teleoperated picks as training data. I also built a separate kinematics simulator of the full gantry and both arms.</p>
+        <div class="pair">
+          <figure>
+            <img src="../assets/img/sr-bed.jpg" alt="SHARP robot model over a simulated strawberry bed in Isaac Sim" loading="lazy" width="1280" height="720">
+            <figcaption>The SHARP arms over a simulated strawberry bed in Isaac Sim.</figcaption>
+          </figure>
+          <figure>
+            <img src="../assets/img/sr-kinematics.jpg" alt="SHARP kinematics simulator showing the gantry robot driving along strawberry beds" loading="lazy" width="1146" height="676">
+            <figcaption>The SHARP kinematics simulator.</figcaption>
+          </figure>
+        </div>
+
+        <h2>Perception</h2>
+        <p>To pick a strawberry cleanly, the robot needs to know where the stem attaches and which way it points. I trained a point-transformer model that segments depth scans of strawberry plants into leaves and berries and predicts each berry's stem attachment point and direction. I paired it with a YOLO detector in a single pose-estimation pipeline.</p>
+        <figure class="fig narrow">
+          <img src="../assets/img/sr-perception.jpg" alt="Segmented point cloud of a strawberry plant with leaves and berries separated and stem vectors drawn" loading="lazy" width="700" height="560">
+          <figcaption>The perception model on a test scan, separating leaves from berries and drawing each predicted stem vector.</figcaption>
+        </figure>
+
+        <h2>Robot learning</h2>
+        <p>We pursued three approaches to the picking policy in parallel, sharing one data format and one benchmark so progress on any of them helped the others. My work across them:</p>
+        <ul>
+          <li><strong>Imitation learning:</strong> recorded teleoperated demonstrations and trained a policy on a multistep picking task.</li>
+          <li><strong>Foundation models:</strong> fine-tuned a large vision-language-action model on our own dataset.</li>
+          <li><strong>Reinforcement learning:</strong> built an automated reward-shaping tool for training a novel dexterous robot, running across multiple machines.</li>
+        </ul>
+      </article>
+
+      <aside class="facts" aria-label="Role details">
+        <dl>
+          <dt>Role</dt>
+          <dd>Co-founder &amp; CTO</dd>
+          <dt>Dates</dt>
+          <dd>2025–present</dd>
+          <dt>Team</dt>
+          <dd>Two co-founders: Walt White (CEO) and me</dd>
+          <dt>Tools</dt>
+          <dd>Isaac Sim, PyTorch, point transformers, YOLO, vision-language-action models, imitation learning, reinforcement learning</dd>
+          <dt>Links</dt>
+          <dd><a href="https://strawberryrobotics.com/">strawberryrobotics.com</a></dd>
+        </dl>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <p><a href="../index.html">All work</a></p>
+    </footer>
+  </div>
+  <script src="../main.js" defer></script>
+</body>
+</html>

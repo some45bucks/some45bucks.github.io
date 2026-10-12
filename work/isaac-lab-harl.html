@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Heterogeneous Multi-Agent Learning in Isaac Lab | Jacob Haight</title>
+  <meta name="description" content="IROS 2025 paper by Jacob Haight et al.: extending NVIDIA Isaac Lab with heterogeneous-agent reinforcement learning for robot teams.">
+  <meta property="og:image" content="../assets/img/harl-soccer.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="bar">
+      <a class="home" href="../index.html">Jacob Haight</a>
+      <nav aria-label="Contact and profiles">
+        <a href="mailto:jacobrhaight@gmail.com">Email</a>
+        <a href="https://github.com/some45bucks">GitHub</a>
+        <a href="https://www.linkedin.com/in/jacob-haight-138480183">LinkedIn</a>
+      </nav>
+    </header>
+
+    <div class="project-head">
+      <a class="crumb" href="../index.html">All work</a>
+      <h1>Heterogeneous Multi-Agent Learning in Isaac Lab: Scalable Simulation for Robotic Collaboration</h1>
+      <p class="meta">IROS 2025, first author</p>
+    </div>
+
+    <div class="feature-media">
+      <div class="yt" data-id="GCoUsj5UNqY" data-title="IROS 2025 paper video">
+        <button type="button" class="yt-play" aria-label="Play the paper video">
+          <img src="../assets/img/harl-soccer.jpg" alt="" width="1280" height="720">
+          <span class="yt-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <article class="prose">
+        <h2>The problem</h2>
+        <p>Robot teams are rarely made of identical robots. A search team might pair a quadruped with a wheeled scout, and a warehouse might mix arms with mobile bases. Training them together with reinforcement learning needs two things at once: fast, physically realistic simulation, and multi-agent algorithms that work when agents have different bodies, observations, and actions.</p>
+        <p>NVIDIA Isaac Lab had the first: GPU-parallel physics that can run thousands of environments at once. But its multi-agent support was thin. It shipped only MAPPO and IPPO, and only one multi-agent environment. MAPPO works best when agents share one policy, which assumes they are interchangeable. IPPO trains each agent independently, so no agent's critic sees the whole team.</p>
+
+        <h2>What I built</h2>
+        <p>I extended Isaac Lab with the algorithms from the Heterogeneous-Agent Reinforcement Learning (HARL) library: HAPPO, HATRPO, and HAA2C, alongside MAPPO with and without parameter sharing. These algorithms update agents one at a time, each accounting for the updates of the agents before it, which suits teams of agents with different bodies and roles.</p>
+        <p>The two libraries were not designed to fit together. HARL expected to build its own simple environments, and its data structures didn't match Isaac Lab's GPU tensors. I kept HARL's training loop largely intact and did the work around it:</p>
+        <ul>
+          <li>Rerouted environment loading so HARL starts from a placeholder that loads and wraps the real Isaac Lab environment.</li>
+          <li>Converted data between the two libraries at several points in each training step so they could communicate.</li>
+          <li>Rewrote parts of the training loop for performance, to keep up with Isaac Lab's GPU-accelerated simulation, and improved logging and checkpoint saving.</li>
+        </ul>
+        <figure class="fig white narrow">
+          <img src="../assets/img/thesis-integration.png" alt="Flowchart: HARL's startup sequence, where a dummy environment loads the real Isaac Lab environment and wraps it before agents load" loading="lazy">
+          <figcaption>How HARL starts up inside Isaac Lab. A placeholder environment hands off to the real Isaac Lab environment, so HARL's training loop didn't need to change.</figcaption>
+        </figure>
+
+        <h2>Environments</h2>
+        <p>Together with my co-authors Christopher Allred and Isaac Peterson, we added multi-agent environments that mix robot types, including quadrupeds, humanoids, and wheeled robots. The paper evaluates MAPPO and HAPPO on six of these tasks.</p>
+        <div class="trio">
+          <figure>
+            <div class="yt" data-id="_NpJHX233Yg" data-title="Multi-agent bar">
+              <button type="button" class="yt-play" aria-label="Play: multi-agent bar environment">
+                <img src="https://i.ytimg.com/vi/_NpJHX233Yg/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+                <span class="yt-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+            <figcaption>Multi-agent bar</figcaption>
+          </figure>
+          <figure>
+            <div class="yt" data-id="CSU6IWL4q6U" data-title="Surfing the ANYmal sea">
+              <button type="button" class="yt-play" aria-label="Play: surfing the ANYmal sea">
+                <img src="https://i.ytimg.com/vi/CSU6IWL4q6U/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+                <span class="yt-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+            <figcaption>Surfing the ANYmal sea</figcaption>
+          </figure>
+          <figure>
+            <div class="yt" data-id="fF4rQ9rXfR4" data-title="Working together">
+              <button type="button" class="yt-play" aria-label="Play: working together">
+                <img src="https://i.ytimg.com/vi/fF4rQ9rXfR4/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+                <span class="yt-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+            <figcaption>Working together</figcaption>
+          </figure>
+        </div>
+
+        <h2>Results</h2>
+        <p>The paper shows that heterogeneous multi-agent training runs in Isaac Lab without giving up its scale and speed. My <a href="thesis.html">master's thesis</a> takes the comparison further: on a quadruped split into cooperating agents, HAPPO learns a better-coordinated gait than MAPPO, with throughput within 1% of it.</p>
+
+        <h2>What happened next</h2>
+        <p class="callout">The framework became the base for the lab's follow-up work on adversarial teams, where heterogeneous robots compete in tasks like soccer and sumo (<a href="https://arxiv.org/abs/2510.01264">Peterson et al., 2025</a>).</p>
+      </article>
+
+      <aside class="facts" aria-label="Paper details">
+        <dl>
+          <dt>Venue</dt>
+          <dd>IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) 2025, pp. 13446–13451</dd>
+          <dt>Authors</dt>
+          <dd><strong>Jacob Haight</strong>, Isaac Peterson, Christopher Allred, Mario Harper</dd>
+          <dt>My role</dt>
+          <dd>First author. Designed and built the HARL integration into Isaac Lab.</dd>
+          <dt>Links</dt>
+          <dd>
+            <ul>
+              <li><a href="https://doi.org/10.1109/IROS60139.2025.11247098">Paper (IEEE)</a></li>
+              <li><a href="https://github.com/DIRECTLab/IsaacLab-HARL">Code on GitHub</a></li>
+              <li><a href="https://directlab.dev/IsaacLab-HARL/papers/paper-harl.html">Project page</a></li>
+              <li><a href="https://youtu.be/GCoUsj5UNqY">Video on YouTube</a></li>
+            </ul>
+          </dd>
+          <dt>Tools</dt>
+          <dd>Isaac Lab, Isaac Sim, PyTorch, HARL</dd>
+        </dl>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <p><a href="../index.html">All work</a></p>
+    </footer>
+  </div>
+  <script src="../main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coordinating Search with Foundation Models and MARL | Jacob Haight</title>
+  <meta name="description" content="IRC 2024 paper: coordinating a heterogeneous robot team for search in unstructured environments with foundation models and a Multi-Agent Transformer in Isaac Sim.">
+  <meta property="og:image" content="../assets/img/irc-rockfield.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="bar">
+      <a class="home" href="../index.html">Jacob Haight</a>
+      <nav aria-label="Contact and profiles">
+        <a href="mailto:jacobrhaight@gmail.com">Email</a>
+        <a href="https://github.com/some45bucks">GitHub</a>
+        <a href="https://www.linkedin.com/in/jacob-haight-138480183">LinkedIn</a>
+      </nav>
+    </header>
+
+    <div class="project-head">
+      <a class="crumb" href="../index.html">All work</a>
+      <h1>Coordinating Search with Foundation Models and Multi-Agent Reinforcement Learning in Complex Environments</h1>
+      <p class="meta">IRC 2024, second author</p>
+    </div>
+
+    <figure class="feature-media compact-media">
+      <video src="../assets/media/irc-rockfield.mp4" poster="../assets/img/irc-rockfield.jpg" muted loop playsinline preload="metadata" controls data-autoplay></video>
+      <figcaption>A legged robot in one of the project's destructible rock-field environments, built with NVIDIA Blast.</figcaption>
+    </figure>
+
+    <div class="layout">
+      <article class="prose">
+        <h2>The project</h2>
+        <p>Search in the real world happens in places like rock fields and forests, at night as often as during the day. This project coordinates a team of different robots searching those environments. Sensor data from the team is turned into a structured knowledge graph using foundation models, and a centralized multi-agent policy decides what each robot does next.</p>
+        <p>The work was a collaboration between Utah State University's DIRECT Lab, NVIDIA, the Army Research Laboratory, and the University of Washington. Environments were built in NVIDIA Isaac Sim and GRUtopia: destructible rock fields, forests, and day and night lighting.</p>
+
+        <h2>My contribution</h2>
+        <p>I implemented the Multi-Agent Transformer (MAT) in Isaac Sim as the team's centralized decision-maker. MAT treats a robot team as a sequence. A transformer encodes every agent's observations together, then decodes actions one agent at a time, with each agent's action conditioned on the actions already chosen for the agents before it.</p>
+        <p>That sequential structure is the same idea behind HAPPO, which became the focus of my <a href="isaac-lab-harl.html">IROS 2025 paper</a> and <a href="thesis.html">master's thesis</a>: agents coordinate better when each one accounts for what its teammates are doing.</p>
+      </article>
+
+      <aside class="facts" aria-label="Paper details">
+        <dl>
+          <dt>Venue</dt>
+          <dd>2024 Eighth IEEE International Conference on Robotic Computing (IRC), Tokyo, pp. 225–230</dd>
+          <dt>Authors</dt>
+          <dd>Christopher Allred, <strong>Jacob Haight</strong>, Chandler Justice, Isaac Peterson, Rosario Scalise, Ted Hromadka, Jason Pusey, Mario Harper</dd>
+          <dt>My role</dt>
+          <dd>Implemented the Multi-Agent Transformer in Isaac Sim</dd>
+          <dt>Links</dt>
+          <dd>
+            <ul>
+              <li><a href="https://doi.org/10.1109/IRC63610.2024.00046">Paper (IEEE)</a></li>
+              <li><a href="https://github.com/DIRECTLab/Coordinating-MAT-Env">Code on GitHub</a></li>
+            </ul>
+          </dd>
+          <dt>Tools</dt>
+          <dd>Isaac Sim, GRUtopia, PyTorch, Multi-Agent Transformer</dd>
+        </dl>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <p><a href="../index.html">All work</a></p>
+    </footer>
+  </div>
+  <script src="../main.js" defer></script>
+</body>
+</html>
