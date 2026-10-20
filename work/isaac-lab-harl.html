@@ -58,8 +58,12 @@
           <li><strong>GPU performance:</strong> removed HARL's redundant copies between GPU and CPU memory, which were slowing down large-scale training.</li>
         </ul>
 
+        <h3>The hard part</h3>
+        <p>The hardest part was getting two systems that were never designed to meet to agree on every detail, and then catching every place they didn't. Bugs in reinforcement learning rarely crash anything. If one agent's observations are padded wrong or its actions reach the wrong robot, training still runs, and the robots just learn badly. This was my first large debugging effort on a learning system, and it taught me to check the data at every boundary instead of trusting the reward curve.</p>
+        <p>It also meant designing the data flow with two goals in mind: fast enough to keep Isaac Lab's GPU simulation busy, and simple enough that new multi-agent environments can be set up through Isaac Lab's usual configuration.</p>
+
         <h2>Environments</h2>
-        <p>To test the framework, our team built a set of multi-agent tasks that mix humanoids and quadrupeds and require physical cooperation. They also serve as templates for anyone building new multi-agent environments in Isaac Lab.</p>
+        <p>To test the framework, I built a set of multi-agent tasks that mix humanoids and quadrupeds and require physical cooperation. Alongside them is Isaac Lab's existing dexterous-hands task as a benchmark. They also serve as templates for anyone building new multi-agent environments in Isaac Lab.</p>
         <figure class="fig">
           <img src="../assets/img/harl-envs.jpg" alt="Six simulated tasks: humanoids standing on platforms carried by quadrupeds, robots moving a piano, robots moving a soccer ball, two quadrupeds carrying a bar, robots pushing green blocks, and two robotic hands passing a ball" loading="lazy" width="1600" height="601">
           <figcaption>(A) Surfing H1: quadrupeds carry a platform while a humanoid balances on it. (B) Piano movers: humanoids and quadrupeds transport a heavy, lopsided piano. (C) Collaborative ball movement. (D) Collaborative bar balancing: two quadrupeds carry a bar on command. (E) Team push: a humanoid and a quadruped push large blocks. (F) Dexterous hands, the one multi-agent task Isaac Lab already had.</figcaption>
@@ -120,7 +124,7 @@
           <dt>Authors</dt>
           <dd><strong>Jacob Haight</strong>, Isaac Peterson, Christopher Allred, Mario Harper</dd>
           <dt>My role</dt>
-          <dd>First author. Designed and built the HARL integration into Isaac Lab.</dd>
+          <dd>First author. Designed and built the HARL integration into Isaac Lab and the new multi-agent environments.</dd>
           <dt>Links</dt>
           <dd>
             <ul>
