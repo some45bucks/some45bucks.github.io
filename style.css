@@ -170,3 +170,4 @@ td.num, th.num { text-align: right; }
 .feature-media.compact-media { max-width: 48rem; }
 .table-wrap { overflow-x: auto; max-width: var(--measure); }
 .table-wrap td, .table-wrap th { white-space: nowrap; }
+.fig.medium { max-width: 36rem; }

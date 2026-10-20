@@ -40,24 +40,30 @@
     <div class="layout">
       <article class="prose">
         <h2>The problem</h2>
-        <p>Robot teams are rarely made of identical robots. A search team might pair a quadruped with a wheeled scout, and a warehouse might mix arms with mobile bases. Training them together with reinforcement learning needs two things at once: fast, physically realistic simulation, and multi-agent algorithms that work when agents have different bodies, observations, and actions.</p>
-        <p>NVIDIA Isaac Lab had the first: GPU-parallel physics that can run thousands of environments at once. But its multi-agent support was thin. It shipped only MAPPO and IPPO, and only one multi-agent environment. MAPPO works best when agents share one policy, which assumes they are interchangeable. IPPO trains each agent independently, so no agent's critic sees the whole team.</p>
+        <p>Real robot teams are rarely made of identical robots. A humanoid and a quadruped moving a heavy object together have different bodies, different sensors, and different actions. Training a team like that with reinforcement learning needs two things at once: fast, physically realistic simulation, and multi-agent algorithms that let each agent learn its own policy.</p>
+        <p>Most multi-agent RL research happens in game-like benchmarks with simplified physics, which don't transfer well to real robots. NVIDIA Isaac Lab has the opposite strength: GPU-parallel, high-fidelity physics that trains thousands of robots at once. But its multi-agent support was limited to two algorithms, IPPO and MAPPO, which assume either fully independent learning or a single policy shared across agents. Neither is built for a team whose members have different observation and action spaces.</p>
 
         <h2>What I built</h2>
-        <p>I extended Isaac Lab with the algorithms from the Heterogeneous-Agent Reinforcement Learning (HARL) library: HAPPO, HATRPO, and HAA2C, alongside MAPPO with and without parameter sharing. These algorithms update agents one at a time, each accounting for the updates of the agents before it, which suits teams of agents with different bodies and roles.</p>
-        <p>The two libraries were not designed to fit together. HARL expected to build its own simple environments, and its data structures didn't match Isaac Lab's GPU tensors. I kept HARL's training loop largely intact and did the work around it:</p>
-        <ul>
-          <li>Rerouted environment loading so HARL starts from a placeholder that loads and wraps the real Isaac Lab environment.</li>
-          <li>Converted data between the two libraries at several points in each training step so they could communicate.</li>
-          <li>Rewrote parts of the training loop for performance, to keep up with Isaac Lab's GPU-accelerated simulation, and improved logging and checkpoint saving.</li>
-        </ul>
-        <figure class="fig white narrow">
-          <img src="../assets/img/thesis-integration.png" alt="Flowchart: HARL's startup sequence, where a dummy environment loads the real Isaac Lab environment and wraps it before agents load" loading="lazy">
-          <figcaption>How HARL starts up inside Isaac Lab. A placeholder environment hands off to the real Isaac Lab environment, so HARL's training loop didn't need to change.</figcaption>
+        <p>I integrated the Heterogeneous-Agent Reinforcement Learning (HARL) library into Isaac Lab. HARL's algorithms, including HAPPO, HATRPO, and HAA2C, update agents one at a time, with each update accounting for the agents updated before it. That lets every robot keep its own policy without parameter sharing.</p>
+        <figure class="fig medium">
+          <img src="../assets/img/harl-system.jpg" alt="Top: six frames of a quadruped and a humanoid pushing a green block together. Bottom: data flow from Isaac Lab observations through HARL's per-robot policies back to Isaac Lab actions and the PhysX simulator." loading="lazy" width="1100" height="866">
+          <figcaption>The framework, from the paper. Isaac Lab passes each agent's state as a dictionary of tensors, and HARL works with a single padded tensor; the integration layer translates in both directions on every step. In the Team Push task above, the ANYmal braces the H1 humanoid while pushing the block with its back right leg, a strategy neither robot was told to use.</figcaption>
         </figure>
+        <p>The two libraries made different assumptions almost everywhere, so most of the work was a translation layer inside HARL that kept the strengths of both:</p>
+        <ul>
+          <li><strong>Data format:</strong> converted Isaac Lab's per-agent dictionaries of tensors into HARL's padded, concatenated tensors and back, every time data crossed between them.</li>
+          <li><strong>Mixed action spaces:</strong> wrote a wrapper that handles agents with different action sizes, without breaking support for identical agents.</li>
+          <li><strong>Environment setup:</strong> restructured HARL's environment loading so Isaac Lab's configuration system could create and configure environments.</li>
+          <li><strong>Sequential updates:</strong> adapted the training loop so HARL's agent-by-agent policy updates run against Isaac Lab's batched simulation.</li>
+          <li><strong>GPU performance:</strong> removed HARL's redundant copies between GPU and CPU memory, which were slowing down large-scale training.</li>
+        </ul>
 
         <h2>Environments</h2>
-        <p>Together with my co-authors Christopher Allred and Isaac Peterson, we added multi-agent environments that mix robot types, including quadrupeds, humanoids, and wheeled robots. The paper evaluates MAPPO and HAPPO on six of these tasks.</p>
+        <p>To test the framework, our team built a set of multi-agent tasks that mix humanoids and quadrupeds and require physical cooperation. They also serve as templates for anyone building new multi-agent environments in Isaac Lab.</p>
+        <figure class="fig">
+          <img src="../assets/img/harl-envs.jpg" alt="Six simulated tasks: humanoids standing on platforms carried by quadrupeds, robots moving a piano, robots moving a soccer ball, two quadrupeds carrying a bar, robots pushing green blocks, and two robotic hands passing a ball" loading="lazy" width="1600" height="601">
+          <figcaption>(A) Surfing H1: quadrupeds carry a platform while a humanoid balances on it. (B) Piano movers: humanoids and quadrupeds transport a heavy, lopsided piano. (C) Collaborative ball movement. (D) Collaborative bar balancing: two quadrupeds carry a bar on command. (E) Team push: a humanoid and a quadruped push large blocks. (F) Dexterous hands, the one multi-agent task Isaac Lab already had.</figcaption>
+        </figure>
         <div class="trio">
           <figure>
             <div class="yt" data-id="_NpJHX233Yg" data-title="Multi-agent bar">
@@ -88,8 +94,20 @@
           </figure>
         </div>
 
+        <h2>Coordination without communication</h2>
+        <p>Agents never message each other. In the bar task, each ANYmal sees only its own velocity, IMU data, and a command for how the bar should move, and both are rewarded for how closely the bar's actual motion matches that command. Any teamwork has to be discovered through the physics of the shared bar.</p>
+        <figure class="fig">
+          <img src="../assets/img/harl-bar-before-after.jpg" alt="Overhead traces of two quadrupeds carrying a green bar. Left: before training, the bar barely turns. Right: after training, the robots sweep the bar through a wide arc." loading="lazy" width="1200" height="792">
+          <figcaption>Asked to turn the bar. Before training (left), both robots rotate in place and the bar barely moves. After training (right), they walk in opposite directions and swing it around efficiently.</figcaption>
+        </figure>
+
         <h2>Results</h2>
-        <p>The paper shows that heterogeneous multi-agent training runs in Isaac Lab without giving up its scale and speed. My <a href="thesis.html">master's thesis</a> takes the comparison further: on a quadruped split into cooperating agents, HAPPO learns a better-coordinated gait than MAPPO, with throughput within 1% of it.</p>
+        <p>We trained MAPPO and HAPPO on three tasks: bar balancing, team push, and dexterous hands, averaging three random seeds each on a single RTX 4090. For the two locomotion tasks, each robot started from a pretrained single-agent walking policy and learned to cooperate from there.</p>
+        <figure class="fig white">
+          <img src="../assets/img/harl-results.png" alt="Learning curves of average reward over 100 million training steps for MAPPO and HAPPO on the team push, bar balancing, and dexterous manipulation tasks" loading="lazy" width="1300" height="784">
+          <figcaption>Average reward over 100 million training steps. Shaded regions show standard deviation across three seeds.</figcaption>
+        </figure>
+        <p>Both algorithms learned stable, effective policies on all three tasks, confirming that heterogeneous agents can be trained in high-fidelity simulation while keeping Isaac Lab's scale. The two algorithms performed about the same on these tasks, which is part of the point: the framework makes it possible to test where heterogeneous methods actually help. My <a href="thesis.html">master's thesis</a> picked up that question and found a task and training length where HAPPO pulls ahead.</p>
 
         <h2>What happened next</h2>
         <p class="callout">The framework became the base for the lab's follow-up work on adversarial teams, where heterogeneous robots compete in tasks like soccer and sumo (<a href="https://arxiv.org/abs/2510.01264">Peterson et al., 2025</a>).</p>
@@ -113,7 +131,7 @@
             </ul>
           </dd>
           <dt>Tools</dt>
-          <dd>Isaac Lab, Isaac Sim, PyTorch, HARL</dd>
+          <dd>Isaac Lab, Isaac Sim (PhysX), PyTorch, HARL</dd>
         </dl>
       </aside>
     </div>
